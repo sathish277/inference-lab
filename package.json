@@ -1,0 +1,28 @@
+{
+  "name": "inside-the-machine",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "next": "16.4.3",
+    "react": "19.2.9",
+    "react-dom": "19.2.9",
+    "three": "0.186.1",
+    "@react-three/fiber": "9.8.2",
+    "@react-three/drei": "10.7.9",
+    "zustand": "5.0.16"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "@types/node": "22.18.12",
+    "@types/three": "0.180.0",
+    "vitest": "3.2.4"
+  }
+}
