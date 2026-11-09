@@ -1,5 +1,4 @@
 import { COURSE, TOTAL_LESSONS, findLesson } from '@/content/course';
-import { memoryWall } from '@/content/lessons/memory-wall';
 import { LessonView } from '@/components/lesson/LessonView';
 
 // SINGLE_PAGE=1 builds a one-page preview: the lesson sits below the outline and links jump to it.
@@ -8,7 +7,8 @@ const SINGLE = process.env.SINGLE_PAGE === '1';
 const lessonHref = (slug: string) => (SINGLE ? `#${slug}` : `/lessons/${slug}/`);
 
 export default function Home() {
-  const built = COURSE.flatMap((m) => m.lessons).filter((l) => l.slug).length;
+  const builtSlugs = COURSE.flatMap((m) => m.lessons).flatMap((l) => (l.slug ? [l.slug] : []));
+  const built = builtSlugs.length;
   return (
     <main className="home" id="top">
       <header className="home-head">
@@ -19,8 +19,8 @@ export default function Home() {
           quantization. No hardware background needed.
         </p>
         <div className="row">
-          <a className="button primary" href={lessonHref('the-memory-wall')}>
-            Start the free lesson: The memory wall
+          <a className="button primary" href={lessonHref('bits-and-bytes')}>
+            Start at Lesson 1: Bits and bytes
           </a>
           <span className="muted">
             {built} of {TOTAL_LESSONS} lessons ready
@@ -52,22 +52,25 @@ export default function Home() {
           </div>
         ))}
       </section>
-      {SINGLE && (() => {
-        const found = findLesson(memoryWall.slug)!;
-        return (
-          <div id={memoryWall.slug} className="single-lesson">
-            <LessonView
-              lesson={memoryWall}
-              number={found.lesson.n}
-              total={TOTAL_LESSONS}
-              moduleNumber={found.moduleIndex + 1}
-              moduleTitle={found.module.title}
-              free={!!found.lesson.free}
-              homeHref="#top"
-            />
-          </div>
-        );
-      })()}
+      {SINGLE &&
+        builtSlugs.map((slug) => {
+          const found = findLesson(slug)!;
+          const next = COURSE.flatMap((m) => m.lessons).find((l) => l.n === found.lesson.n + 1);
+          return (
+            <div key={slug} id={slug} className="single-lesson">
+              <LessonView
+                slug={slug}
+                number={found.lesson.n}
+                total={TOTAL_LESSONS}
+                moduleNumber={found.moduleIndex + 1}
+                moduleTitle={found.module.title}
+                free={!!found.lesson.free}
+                homeHref="#top"
+                nextHref={next?.slug ? `#${next.slug}` : undefined}
+              />
+            </div>
+          );
+        })}
       <footer className="site-foot">Built with real device specs. Every number shows its source.</footer>
     </main>
   );

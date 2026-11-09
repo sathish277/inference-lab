@@ -214,3 +214,24 @@ html { scroll-behavior: smooth; }
 .single-lesson .lesson { padding-top: 40px; }
 .home:has(.single-lesson) { max-width: 1280px; }
 .home:has(.single-lesson) > .home-head, .home:has(.single-lesson) > .modules { max-width: 1040px; width: 100%; margin: 0 auto; }
+
+/* ---------- Lesson 1: bits and bytes ---------- */
+.place { font: 600 12px var(--font-mono); padding: 2px 6px; border-radius: 4px; background: rgba(20, 32, 43, 0.75); color: #c9d3dc; pointer-events: none; }
+.place.on { background: #f0a43a; color: #1d1405; }
+.byte-readout { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.big-binary { font: 600 32px var(--font-mono); color: var(--mem); letter-spacing: 0.04em; }
+.big-dec { font: 700 40px var(--font-mono); font-variant-numeric: tabular-nums; }
+.switch-row { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
+.switch-row .bit { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 0 8px; font-family: var(--font-mono); }
+.switch-row .bit .bit-val { font-size: 22px; font-weight: 600; }
+.switch-row .bit .bit-place { font-size: 11.5px; color: var(--muted); font-weight: 500; }
+.switch-row .bit.on { background: var(--mem-soft); border-color: var(--mem); }
+.switch-row .bit.on .bit-val { color: var(--mem); }
+.target { padding: 12px 14px; border-radius: 8px; border: 1px dashed var(--line); font-size: 15px; }
+.target.solved { border-style: solid; border-color: var(--good); background: var(--good-soft); }
+.more-bits { border-top: 1px solid var(--line); padding-top: 14px; }
+.units { border-collapse: collapse; font-size: 14.5px; }
+.units td { padding: 6px 16px 6px 0; border-bottom: 1px solid var(--line); }
+.units td.num { text-align: right; }
+.next .button { margin-left: 8px; }
+@media (max-width: 520px) { .big-binary { font-size: 24px; } .big-dec { font-size: 30px; } .switch-row .bit .bit-val { font-size: 18px; } }

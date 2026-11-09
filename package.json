@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "vitest run"
+    "test": "vitest run",
+    "preview:single": "node scripts/make-single-file.mjs"
   },
   "dependencies": {
     "@react-three/drei": "10.7.9",

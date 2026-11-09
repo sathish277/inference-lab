@@ -116,11 +116,11 @@ export function LaptopBody({ screenTexture, children }: { screenTexture?: THREE.
  * Two RAM sticks with 16 chips in total. Each chip stands for 1/16 of the model's weights.
  * The scene animates the chips every frame through `chipMats` (no React re-render per frame).
  */
-export function RamSticks({ chipMats }: { chipMats: React.MutableRefObject<THREE.MeshToonMaterial[]> }) {
+export function RamSticks({ chipMats, label = 'RAM · memory' }: { chipMats?: React.MutableRefObject<THREE.MeshToonMaterial[]>; label?: string }) {
   const { ram, boardY } = LAYOUT;
   const chipLen = ram.length / ram.chips;
   return (
-    <Part id="ram" label="RAM · memory" labelPos={[-1.42, 0.45, 1.3]}>
+    <Part id="ram" label={label} labelPos={[-1.42, 0.45, 1.3]}>
       {ram.x.map((x, s) => (
         <group key={s} position={[x, boardY + 0.04, ram.z]}>
           <mesh>
@@ -139,7 +139,7 @@ export function RamSticks({ chipMats }: { chipMats: React.MutableRefObject<THREE
                 <boxGeometry args={[0.22, 0.05, chipLen * 0.72]} />
                 <meshToonMaterial
                   ref={(m) => {
-                    if (m) chipMats.current[idx] = m;
+                    if (m && chipMats) chipMats.current[idx] = m;
                   }}
                   color={C.chip}
                   emissive={C.memory}

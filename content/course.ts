@@ -10,7 +10,7 @@ export const COURSE: Module[] = [
     blurb: 'Bits, the processor, and the ladder of memory speeds. No background needed.',
     free: true,
     lessons: [
-      { n: 1, title: 'Bits and bytes', question: 'How does a number live inside a chip?', free: true },
+      { n: 1, title: 'Bits and bytes', question: 'How does a number live inside a chip?', slug: 'bits-and-bytes', free: true },
       { n: 2, title: 'The multiply-add', question: 'What does a processor actually do?', free: true },
       { n: 3, title: 'The speed ladder', question: 'Why are there so many kinds of memory?', free: true },
       { n: 4, title: 'Bandwidth vs latency', question: 'Is a wide road or a short road better?', free: true },

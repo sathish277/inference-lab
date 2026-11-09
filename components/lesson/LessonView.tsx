@@ -1,16 +1,16 @@
 'use client';
 // The lesson template every lesson uses:
 //   Hook → Predict → Lab (3D scene + four tabs) → Check yourself → Done when → Next lesson
+// Each lesson gets its own state (LabProvider), so two lessons on one page never share knobs.
 
 import { Component, useEffect, useState, type ReactNode } from 'react';
 import { Predict } from './Predict';
 import { Quiz } from './Quiz';
 import { LabPanel } from './LabPanel';
-import { useLab } from '@/store/lab';
-import type { LessonContent } from '@/content/lessons/memory-wall';
-
+import { LabProvider, useLab } from '@/store/lab';
 import { Stage } from '@/world/Stage';
-import { MemoryWallScene } from '@/scenes/MemoryWallScene';
+import { LESSON_CONTENT } from '@/content/lessons';
+import { LESSON_INTERACTIVE, type LessonInteractive } from '@/lessons/registry';
 
 /** Renders children only in the browser (3D can't run during the static build). */
 function ClientOnly({ children }: { children: ReactNode }) {
@@ -38,18 +38,7 @@ class SceneErrorBoundary extends Component<{ children: ReactNode }, { error: str
   }
 }
 
-type Props = {
-  lesson: LessonContent;
-  number: number;
-  total: number;
-  moduleNumber: number;
-  moduleTitle: string;
-  free: boolean;
-  /** Where the breadcrumb's course link goes. */
-  homeHref?: string;
-};
-
-function SceneOverlay() {
+function SceneOverlay({ interactive }: { interactive: LessonInteractive }) {
   const camera = useLab((s) => s.camera);
   const set = useLab((s) => s.set);
   return (
@@ -63,76 +52,99 @@ function SceneOverlay() {
         </button>
       </div>
       <div className="legend" aria-label="Color key">
-        <span>
-          <i className="dot mem" /> weights moving
-        </span>
-        <span>
-          <i className="dot cpu" /> doing math
-        </span>
-        <span>
-          <i className="dot bad" /> doesn’t fit
-        </span>
+        {interactive.legend.map((l) => (
+          <span key={l.label}>
+            <i className="dot" style={{ background: l.color }} /> {l.label}
+          </span>
+        ))}
       </div>
-      <p className="scene-hint">Drag to turn · scroll to zoom · click a part</p>
+      <p className="scene-hint">{interactive.sceneHint}</p>
     </>
   );
 }
 
-export function LessonView({ lesson, number, total, moduleNumber, moduleTitle, free, homeHref = '/' }: Props) {
+type Props = {
+  slug: string;
+  number: number;
+  total: number;
+  moduleNumber: number;
+  moduleTitle: string;
+  free: boolean;
+  /** Where the breadcrumb's course link goes. */
+  homeHref?: string;
+  /** Where "next lesson" links, if that lesson is built. */
+  nextHref?: string;
+};
+
+export function LessonView({ slug, number, total, moduleNumber, moduleTitle, free, homeHref = '/', nextHref }: Props) {
+  const lesson = LESSON_CONTENT[slug];
+  const interactive = LESSON_INTERACTIVE[slug];
+  if (!lesson || !interactive) return null;
+  const { Scene } = interactive;
+
   return (
-    <main className="lesson">
-      <header className="lesson-head">
-        <nav className="crumbs" aria-label="Breadcrumb">
-          <a href={homeHref}>Inference Lab</a>
-          <span aria-hidden="true">/</span>
-          <span>
-            Module {moduleNumber} · {moduleTitle}
-          </span>
-        </nav>
-        <div className="title-row">
-          <span className="lesson-no">
-            Lesson {number} <span className="of">of {total}</span>
-          </span>
-          {free && <span className="pill free">Free</span>}
-        </div>
-        <h1>{lesson.title}</h1>
-        <p className="hook">{lesson.hook}</p>
-      </header>
+    <LabProvider>
+      <main className="lesson">
+        <header className="lesson-head">
+          <nav className="crumbs" aria-label="Breadcrumb">
+            <a href={homeHref}>Inference Lab</a>
+            <span aria-hidden="true">/</span>
+            <span>
+              Module {moduleNumber} · {moduleTitle}
+            </span>
+          </nav>
+          <div className="title-row">
+            <span className="lesson-no">
+              Lesson {number} <span className="of">of {total}</span>
+            </span>
+            {free && <span className="pill free">Free</span>}
+          </div>
+          <h1>{lesson.title}</h1>
+          <p className="hook">{lesson.hook}</p>
+        </header>
 
-      <Predict {...lesson.predict} unit="tokens/s" />
+        <Predict {...lesson.predict} idPrefix={slug} />
 
-      <section className="lab" aria-label="Interactive lab">
-        <div className="scene">
-          <SceneErrorBoundary>
-            <ClientOnly>
-              <Stage>
-                <MemoryWallScene />
-              </Stage>
-            </ClientOnly>
-          </SceneErrorBoundary>
-          <SceneOverlay />
-        </div>
-        <LabPanel lesson={lesson} />
-      </section>
+        <section className="lab" aria-label="Interactive lab">
+          <div className="scene">
+            <SceneErrorBoundary>
+              <ClientOnly>
+                <Stage views={interactive.views}>
+                  <Scene />
+                </Stage>
+              </ClientOnly>
+            </SceneErrorBoundary>
+            <SceneOverlay interactive={interactive} />
+          </div>
+          <LabPanel lesson={lesson} tabs={interactive.tabs} />
+        </section>
 
-      <section className="check" aria-labelledby="check-title">
-        <span className="eyebrow">Check yourself</span>
-        <h2 id="check-title">Quiz</h2>
-        <p className="muted">Try each one before opening the hint. Use the lab to test your answer.</p>
-        <Quiz items={lesson.quiz} />
-      </section>
+        <section className="check" aria-labelledby={`check-${slug}`}>
+          <span className="eyebrow">Check yourself</span>
+          <h2 id={`check-${slug}`}>Quiz</h2>
+          <p className="muted">Try each one before opening the hint. Use the lab to test your answer.</p>
+          <Quiz items={lesson.quiz} />
+        </section>
 
-      <section className="done" aria-labelledby="done-title">
-        <h2 id="done-title">You’re done with this lesson when you can…</h2>
-        <ul>
-          {lesson.doneWhen.map((d) => (
-            <li key={d}>{d}</li>
-          ))}
-        </ul>
-        <p className="next">
-          Next: Lesson {lesson.next.n}, {lesson.next.title}. {lesson.next.question} <span className="soon">Coming soon</span>
-        </p>
-      </section>
-    </main>
+        <section className="done" aria-labelledby={`done-${slug}`}>
+          <h2 id={`done-${slug}`}>You’re done with this lesson when you can…</h2>
+          <ul>
+            {lesson.doneWhen.map((d) => (
+              <li key={d}>{d}</li>
+            ))}
+          </ul>
+          <p className="next">
+            Next: Lesson {lesson.next.n}, {lesson.next.title}. {lesson.next.question}{' '}
+            {nextHref ? (
+              <a className="button primary" href={nextHref}>
+                Go to Lesson {lesson.next.n}
+              </a>
+            ) : (
+              <span className="soon">Coming soon</span>
+            )}
+          </p>
+        </section>
+      </main>
+    </LabProvider>
   );
 }

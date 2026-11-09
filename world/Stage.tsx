@@ -7,18 +7,20 @@ import { CameraControls } from '@react-three/drei';
 import { Desk } from './Laptop';
 import { useLab, type CameraView } from '@/store/lab';
 
-const VIEWS: Record<CameraView, { pos: [number, number, number]; target: [number, number, number] }> = {
+export type Views = Record<CameraView, { pos: [number, number, number]; target: [number, number, number] }>;
+
+export const DEFAULT_VIEWS: Views = {
   laptop: { pos: [0.7, 4.9, 7.6], target: [0, 0.75, -0.3] },
   inside: { pos: [0, 6.2, 4.1], target: [0, 0, 0.1] },
 };
 
-function CameraRig() {
+function CameraRig({ views }: { views: Views }) {
   const ref = useRef<CameraControls>(null);
   const view = useLab((s) => s.camera);
   useEffect(() => {
-    const v = VIEWS[view];
+    const v = views[view];
     ref.current?.setLookAt(...v.pos, ...v.target, true);
-  }, [view]);
+  }, [view, views]);
   return (
     <CameraControls
       ref={ref}
@@ -40,7 +42,7 @@ function hasWebGL(): boolean {
   }
 }
 
-export function Stage({ children }: { children: ReactNode }) {
+export function Stage({ children, views = DEFAULT_VIEWS }: { children: ReactNode; views?: Views }) {
   const [ok, setOk] = useState<boolean | null>(null);
   useEffect(() => setOk(hasWebGL()), []);
 
@@ -56,7 +58,7 @@ export function Stage({ children }: { children: ReactNode }) {
   return (
     <Canvas
       dpr={[1, 1.75]}
-      camera={{ position: VIEWS.laptop.pos, fov: 36, near: 0.1, far: 60 }}
+      camera={{ position: views.laptop.pos, fov: 36, near: 0.1, far: 60 }}
       gl={{ antialias: true, alpha: true }}
       onPointerMissed={() => (document.body.style.cursor = '')}
     >
@@ -67,7 +69,7 @@ export function Stage({ children }: { children: ReactNode }) {
         <Desk />
         {children}
       </Suspense>
-      <CameraRig />
+      <CameraRig views={views} />
     </Canvas>
   );
 }

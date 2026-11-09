@@ -2,7 +2,7 @@
 // End-of-lesson quiz. A wrong answer reveals the hint, so learners try again before seeing the explanation.
 
 import { useState } from 'react';
-import type { QuizItem } from '@/content/lessons/memory-wall';
+import type { QuizItem } from '@/content/types';
 
 function Question({ item, index, onDone }: { item: QuizItem; index: number; onDone: (firstTry: boolean) => void }) {
   const [wrong, setWrong] = useState<number[]>([]);

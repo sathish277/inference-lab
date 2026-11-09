@@ -1,8 +1,8 @@
 // Lesson 13 content. Text lives here, separate from the components, so lessons are quick to write and edit.
 
-export type QuizItem = { q: string; options: string[]; answer: number; hint: string; why: string };
+import type { LessonContent } from '@/content/types';
 
-export const memoryWall = {
+export const memoryWall: LessonContent = {
   slug: 'the-memory-wall',
   title: 'The memory wall',
   hook: 'Your laptop can do about 2 trillion math operations every second. So why does it write only about 9 words a second?',
@@ -10,8 +10,11 @@ export const memoryWall = {
     question:
       'Take a 7B model squeezed to 4 bits per weight (half a byte each). Your laptop’s RAM can move about 51 GB per second. What’s the most tokens per second your laptop could ever produce?',
     hint: 'First work out how many GB the processor must read for one token. Then ask: how many times per second can RAM deliver that much?',
+    unit: 'tokens/s',
     answerLow: 8,
     answerHigh: 16,
+    tooHigh: 'is too high. RAM can’t deliver the model that often.',
+    tooLow: 'is too low. The laptop can do better than that.',
     working: [
       'Model size = 7 billion × 0.5 byte = 3.5 GB',
       'Ceiling = 51.2 GB/s ÷ 3.5 GB = about 14.6 tokens per second',
@@ -75,7 +78,7 @@ export const memoryWall = {
       hint: 'Compare 13 GB with the free RAM. Where does the rest have to come from on every token?',
       why: 'Only about 5 GB is free, so most of the model streams from the SSD at about 2 GB/s on every token. That’s well under 1 token per second. Use 4-bit or a smaller model.',
     },
-  ] satisfies QuizItem[],
+  ],
   doneWhen: [
     'You can say in one sentence why memory bandwidth, not processor speed, limits tokens per second for one user.',
     'You can work out the ceiling for any model and device by hand: bandwidth ÷ model size.',
@@ -84,5 +87,3 @@ export const memoryWall = {
   ],
   next: { n: 15, title: 'The KV cache', question: 'Why do long chats slow down?' },
 };
-
-export type LessonContent = typeof memoryWall;

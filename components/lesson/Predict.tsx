@@ -11,9 +11,13 @@ type Props = {
   working: string[];
   takeaway: string;
   unit: string;
+  tooHigh: string;
+  tooLow: string;
+  /** Keeps element ids unique when several lessons share a page. */
+  idPrefix: string;
 };
 
-export function Predict({ question, hint, answerLow, answerHigh, working, takeaway, unit }: Props) {
+export function Predict({ question, hint, answerLow, answerHigh, working, takeaway, unit, tooHigh, tooLow, idPrefix }: Props) {
   const [guess, setGuess] = useState('');
   const [showHint, setShowHint] = useState(false);
   const [checked, setChecked] = useState(false);
@@ -21,21 +25,21 @@ export function Predict({ question, hint, answerLow, answerHigh, working, takeaw
   const g = parseFloat(guess);
   let feedback = 'No guess? Here’s the working:';
   if (!Number.isNaN(g)) {
-    if (g >= answerLow && g <= answerHigh) feedback = `Spot on. ${g} ${unit} is right in the range.`;
-    else if (g > answerHigh) feedback = `${g} ${unit} is too high. RAM can’t deliver the model that often.`;
-    else feedback = `${g} ${unit} is too low. The laptop can do better than that.`;
+    if (g >= answerLow && g <= answerHigh) feedback = `Spot on. ${g} ${unit} is right.`;
+    else if (g > answerHigh) feedback = `${g} ${unit} ${tooHigh}`;
+    else feedback = `${g} ${unit} ${tooLow}`;
   }
 
   return (
-    <section className="predict" aria-labelledby="predict-title">
+    <section className="predict" aria-labelledby={`${idPrefix}-predict-title`}>
       <span className="eyebrow">Predict first</span>
-      <h2 id="predict-title">Make a guess before you look</h2>
+      <h2 id={`${idPrefix}-predict-title`}>Make a guess before you look</h2>
       <p>{question}</p>
       <div className="row">
-        <label htmlFor="guess" className="mono-label">
+        <label htmlFor={`${idPrefix}-guess`} className="mono-label">
           My guess
         </label>
-        <input id="guess" type="number" min={0} inputMode="decimal" placeholder={unit} value={guess} onChange={(e) => setGuess(e.target.value)} />
+        <input id={`${idPrefix}-guess`} type="number" min={0} inputMode="decimal" placeholder={unit} value={guess} onChange={(e) => setGuess(e.target.value)} />
         <button type="button" onClick={() => setShowHint(true)} disabled={showHint}>
           Show a hint
         </button>
@@ -52,7 +56,7 @@ export function Predict({ question, hint, answerLow, answerHigh, working, takeaw
               <li key={w}>{w}</li>
             ))}
           </ol>
-          <p>{takeaway} Now test it in the lab below.</p>
+          <p>{takeaway} Now try it in the lab below.</p>
         </div>
       )}
     </section>
