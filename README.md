@@ -1,4 +1,4 @@
-# Inside the Machine
+# Inference Lab
 
 An interactive 3D course on how AI models really run on hardware, from bits and bytes to GPUs and quantization.
 

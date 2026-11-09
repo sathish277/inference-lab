@@ -13,7 +13,7 @@ export default function Home() {
     <main className="home" id="top">
       <header className="home-head">
         <span className="pill">An interactive course · {TOTAL_LESSONS} lessons</span>
-        <h1>Inside the Machine</h1>
+        <h1>Inference Lab</h1>
         <p className="hook">
           Open up a laptop and watch an AI model run, token by token. Learn how hardware really runs AI, from bits and bytes to GPUs and
           quantization. No hardware background needed.

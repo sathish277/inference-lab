@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Inside the Machine',
+  title: 'Inference Lab',
   description: 'See how AI models really run on your hardware, from bits to GPUs, in interactive 3D.',
 };
 

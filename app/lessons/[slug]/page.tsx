@@ -14,7 +14,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const found = findLesson(slug);
-  return { title: found ? `${found.lesson.title} · Inside the Machine` : 'Inside the Machine' };
+  return { title: found ? `${found.lesson.title} · Inference Lab` : 'Inference Lab' };
 }
 
 export default async function LessonPage({ params }: { params: Promise<{ slug: string }> }) {

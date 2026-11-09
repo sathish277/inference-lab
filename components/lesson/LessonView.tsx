@@ -83,7 +83,7 @@ export function LessonView({ lesson, number, total, moduleNumber, moduleTitle, f
     <main className="lesson">
       <header className="lesson-head">
         <nav className="crumbs" aria-label="Breadcrumb">
-          <a href={homeHref}>Inside the Machine</a>
+          <a href={homeHref}>Inference Lab</a>
           <span aria-hidden="true">/</span>
           <span>
             Module {moduleNumber} · {moduleTitle}
