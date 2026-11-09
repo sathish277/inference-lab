@@ -3,7 +3,6 @@
 //   Hook → Predict → Lab (3D scene + four tabs) → Check yourself → Done when → Next lesson
 
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
 import { Predict } from './Predict';
 import { Quiz } from './Quiz';
 import { LabPanel } from './LabPanel';
@@ -21,6 +20,8 @@ type Props = {
   moduleNumber: number;
   moduleTitle: string;
   free: boolean;
+  /** Where the breadcrumb's course link goes. */
+  homeHref?: string;
 };
 
 function SceneOverlay() {
@@ -52,12 +53,12 @@ function SceneOverlay() {
   );
 }
 
-export function LessonView({ lesson, number, total, moduleNumber, moduleTitle, free }: Props) {
+export function LessonView({ lesson, number, total, moduleNumber, moduleTitle, free, homeHref = '/' }: Props) {
   return (
     <main className="lesson">
       <header className="lesson-head">
         <nav className="crumbs" aria-label="Breadcrumb">
-          <Link href="/">Inside the Machine</Link>
+          <a href={homeHref}>Inside the Machine</a>
           <span aria-hidden="true">/</span>
           <span>
             Module {moduleNumber} · {moduleTitle}

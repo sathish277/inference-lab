@@ -206,3 +206,11 @@ input[type='range'] { width: 100%; accent-color: var(--cpu); }
   .bar-row { grid-template-columns: 96px 1fr 62px; font-size: 12.5px; }
 }
 @media (prefers-reduced-motion: reduce) { .fill { transition: none; } }
+
+/* one-page preview: the lesson sits below the course outline */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+.single-lesson { border-top: 1px solid var(--line); margin: 0 -20px; }
+.single-lesson .lesson { padding-top: 40px; }
+.home:has(.single-lesson) { max-width: 1280px; }
+.home:has(.single-lesson) > .home-head, .home:has(.single-lesson) > .modules { max-width: 1040px; width: 100%; margin: 0 auto; }
