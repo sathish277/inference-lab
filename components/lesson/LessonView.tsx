@@ -2,16 +2,41 @@
 // The lesson template every lesson uses:
 //   Hook → Predict → Lab (3D scene + four tabs) → Check yourself → Done when → Next lesson
 
-import dynamic from 'next/dynamic';
+import { Component, useEffect, useState, type ReactNode } from 'react';
 import { Predict } from './Predict';
 import { Quiz } from './Quiz';
 import { LabPanel } from './LabPanel';
 import { useLab } from '@/store/lab';
 import type { LessonContent } from '@/content/lessons/memory-wall';
 
-// 3D only runs in the browser, never during the static build.
-const Stage = dynamic(() => import('@/world/Stage').then((m) => m.Stage), { ssr: false });
-const MemoryWallScene = dynamic(() => import('@/scenes/MemoryWallScene').then((m) => m.MemoryWallScene), { ssr: false });
+import { Stage } from '@/world/Stage';
+import { MemoryWallScene } from '@/scenes/MemoryWallScene';
+
+/** Renders children only in the browser (3D can't run during the static build). */
+function ClientOnly({ children }: { children: ReactNode }) {
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
+  return ready ? <>{children}</> : null;
+}
+
+/** If the 3D scene crashes, show why instead of a blank box. The rest of the lesson keeps working. */
+class SceneErrorBoundary extends Component<{ children: ReactNode }, { error: string | null }> {
+  state = { error: null as string | null };
+  static getDerivedStateFromError(e: unknown) {
+    return { error: e instanceof Error ? e.message : String(e) };
+  }
+  render() {
+    if (this.state.error)
+      return (
+        <div className="stage-fallback">
+          <p>
+            The 3D scene couldn’t start: <code>{this.state.error}</code>. The tabs on the right still work.
+          </p>
+        </div>
+      );
+    return this.props.children;
+  }
+}
 
 type Props = {
   lesson: LessonContent;
@@ -78,9 +103,13 @@ export function LessonView({ lesson, number, total, moduleNumber, moduleTitle, f
 
       <section className="lab" aria-label="Interactive lab">
         <div className="scene">
-          <Stage>
-            <MemoryWallScene />
-          </Stage>
+          <SceneErrorBoundary>
+            <ClientOnly>
+              <Stage>
+                <MemoryWallScene />
+              </Stage>
+            </ClientOnly>
+          </SceneErrorBoundary>
           <SceneOverlay />
         </div>
         <LabPanel lesson={lesson} />
